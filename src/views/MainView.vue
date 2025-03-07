@@ -20,7 +20,7 @@
                     <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta">
                 </div>
                 <div>
-                    <label for="solicitud_aprobacion">Con Solicitud de Aprobación ¿Sí – No?:</label>
+                    <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
                     <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" >
                         <option :value="null">Seleccione Estado</option>
                         <option :value="1">SI</option>
@@ -54,7 +54,7 @@
         </div>
         <div class="buttons">
             <button class="consultar" @click="get_orden_compra_data">Consultar</button>
-            <button class="exportar" @click="exportar_excel">Exportar</button>
+            <button class="exportar" @click="handleGetRegistros">Exportar</button>
             <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
             <button class="limpiar" @click="limpiarCampos">Limpiar</button>
         </div>   
@@ -62,7 +62,7 @@
 
     <div class="container-n">
         <div class="table-container">
-            <h3>Número de registros</h3>
+            <h3 class="h3-title">NÚMERO DE REGISTROS</h3>
             <table>
                 <thead>
                     <tr>
@@ -87,28 +87,28 @@
                         <td>{{ orden.proveedor }}</td>
                         <td>{{ orden.autorizada }}</td>
                         <td>
-                            <select v-model="orden.enviada_a_aprobar" class="form-control">
+                            <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
                                 <option :value="null">Seleccione Estado</option>
                                 <option :value="1">SI</option>
                                 <option :value="0">NO</option>
                             </select>
                         </td>
                         <td>
-                            <select v-model="orden.enviada_a_proveedor" class="form-control">
+                            <select v-model="orden.enviada_a_proveedor" class="form-control" @change="updateEnviadaProveedor(orden)">
                                 <option :value="null">Seleccione Estado</option>
                                 <option :value="1">SI</option>
                                 <option :value="0">NO</option>
                             </select>
                         </td>
                         <td>
-                            <select v-model="orden.confirmada_por_proveedor" class="form-control">
+                            <select v-model="orden.confirmada_por_proveedor" class="form-control" @change="updateConfirmadaProveedor(orden)">
                                 <option :value="null">Seleccione Estado</option>
                                 <option :value="1">SI</option>
                                 <option :value="0">NO</option>
                             </select>
                         </td>
                         <td>
-                            <input type="date" v-model="orden.fecha_envio_proveedor" class="form-control" :min="orden.fecha_orden_compra">
+                            <input type="date" v-model="orden.fecha_envio_proveedor" @change="updateFecha(orden)" class="form-control" :min="orden.fecha_orden_compra">
                         </td>
                         <td>
                             <textarea class="form-control" v-model="orden.observaciones" @change="updateTextArea(orden)"></textarea>
@@ -116,6 +116,47 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="pagination" v-if="total_registros > 15">
+          <label for="records-per-page">Registros por página:</label>
+          <select 
+            id="records-per-page" 
+            v-model="limit" 
+            @change="changePage(1)"
+          >
+            <option value="15">15</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+          </select>
+          <button 
+            :disabled="position <= 1" 
+            @click="changePage(1)"
+          >
+            Primera
+          </button>
+          
+          <button 
+            :disabled="position <= 1" 
+            @click="changePage(position - 1)"
+          >
+            Anterior
+          </button>
+          
+          <span>Página {{ position }} de {{ total_paginas }}</span>
+          
+          <button 
+            :disabled="position >= total_paginas" 
+            @click="changePage(position + 1)"
+          >
+            Siguiente
+          </button>
+          
+          <button 
+            :disabled="position >= total_paginas" 
+            @click="changePage(total_paginas)"
+          >
+            Última
+          </button>
         </div>
     </div>
 
@@ -173,6 +214,15 @@
           </div>
       </div>
     </div>
+
+    <!-- Overlay de carga -->
+    <div v-if="loading" class="loading-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden"></span>
+        </div>
+        <p class="mt-2 text-light">{{ loading_msg }}</p>
+    </div>
+
 </template>
 
 <script setup>
@@ -208,8 +258,16 @@ const selectedConfirmadaProveedor = ref(null);
 const selectedFechaEnvioProveedor = ref(null);
 const selectedObservaciones = ref("");
 
+const total_paginas = ref(0);
+const total_registros = ref(0);
+const limit = ref(15);
+const position = ref(1);
+
 const msg = ref('');
 const errorMsg = ref('');
+
+const loading = ref(false);
+const loading_msg = ref('');
 
 // ✅ Función para guardar un registro de orden de compra
 const guardar_registro_estado_oc = async () => {
@@ -276,6 +334,8 @@ const get_orden_compra_data = async () => {
                 usuario: selectUsuario.value,
                 enviada_proveedor: enviada_proveedor.value,
                 confirmada_proveedor: confirmada_proveedor.value,
+                limit: parseInt(limit.value),
+                position: parseInt(position.value),
             },
             {
                 headers: {
@@ -283,9 +343,12 @@ const get_orden_compra_data = async () => {
                 }
             }
         );
+        console.log(response);
         if (response.status === 200) {
             msg.value = response.data.message;
-            lista_ordenes.value = response.data.data
+            lista_ordenes.value = response.data.data.registros;
+            total_paginas.value = response.data.data.total_pag;
+            total_registros.value = response.data.data.total_registros;
         }
 
     } catch (error) {
@@ -388,7 +451,23 @@ const selectRow = (orden) => {
     selectedFechaEnvioProveedor.value = orden.fecha_envio_proveedor;
     selectedObservaciones.value = orden.observaciones.trim();
 };
-// ✅ Función para seleccionar el registro a editar
+// ✅ Función para actualizar el valor del select enviado a aprobar
+const updateEnviadaAprobar = (orden) => {
+    selectedEnviadaAprobar.value = orden.enviada_a_aprobar;
+};
+// ✅ Función para actualizar el valor del select enviado a proveedor
+const updateEnviadaProveedor = (orden) => {
+    selectedEnviadaProveedor.value = orden.enviada_a_proveedor;
+};
+// ✅ Función para actualizar el valor del select confirmado a aprobar
+const updateConfirmadaProveedor = (orden) => {
+    selectedConfirmadaProveedor.value = orden.confirmada_por_proveedor;
+};
+// ✅ Función para actualizar el valor de la fecha envío proveedor
+const updateFecha = (orden) => {
+    selectedFechaEnvioProveedor.value = orden.fecha_envio_proveedor;
+};
+// ✅ Función para actualizar el valor del textarea
 const updateTextArea = (orden) => {
     selectedObservaciones.value = orden.observaciones;
 };
@@ -402,6 +481,26 @@ const limpiarCampos = () => {
   selectUsuario.value = null;
   confirmada_proveedor.value = null;
   lista_ordenes.value = [];
+  total_registros.value = 0;
+  position.value = 1;
+  limit.value = 15;
+};
+// ✅ Función para cambiar pagina del paginador
+const changePage = async (newPosition) => {
+  position.value = newPosition;
+  await get_orden_compra_data(); // Vuelve a cargar los datos con el nuevo límite y posición
+};
+// ✅ Función para realizar carga de pantalla de espera.
+const handleGetRegistros = async () => {
+  try {
+    loading.value = true; // Mostrar el spinner antes de la llamada API
+    loading_msg.value = 'Exportando datos, por favor espere...';
+      await exportar_excel(); // Llama a la función que obtiene los correos
+  } catch (error) {
+      console.error('Error al exportar excel:', error);
+  } finally {
+    loading.value = false; // Oculta el spinner al finalizar la operación
+  }
 };
 // Código que se ejecuta al montar el componente
 onMounted(() => {
@@ -428,16 +527,6 @@ body {
     padding: 32px;
     border-bottom: 2px solid #e5e7eb; /* Línea divisoria */
     width: 100%;
-    display: flex;
-    flex-direction: column; /* Asegura que los elementos internos se acomoden verticalmente */
-    align-self: center;
-}
-
-.container-nnn {
-    width: 100%;
-    height: 100vh; /* Toma toda la altura de la pantalla */
-    padding: 32px;
-    background-color: #ffffff;
     display: flex;
     flex-direction: column; /* Asegura que los elementos internos se acomoden verticalmente */
     align-self: center;
@@ -550,11 +639,11 @@ body {
 .buttons .limpiar:hover {
     background-color: #cf3476;
 }
-
-/* Tabla */
-.table-containernnn {
-    margin-top: 20px;
+.h3-title {
+    font-size: 1.25rem;
+    font-weight: bold;
 }
+/* Tabla */
 .table-container {
     flex-grow: 1; /* Permite que la tabla ocupe todo el espacio restante */
     overflow-y: auto; /* Activa el scroll interno en la tabla */
@@ -617,6 +706,63 @@ th {
   background-color: #fff7dd;
   border: 1px solid #b4ab0a;
   font-weight: bold;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 2px;
+  font-size: 14px; /* Reduce el tamaño de la fuente */
+  padding: 8px;
+}
+
+.pagination label {
+  margin-right: 10px;
+  font-size: 0.9rem;
+}
+
+.pagination select {
+  margin-right: 20px;
+  padding: 4px;
+  font-size: 0.8rem;
+  height: 30px;
+}
+
+.pagination button {
+  background-color: #ffc300;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  height: 30px;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  margin: 0 10px;
+  font-size: 0.9rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7); /* Fondo oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que esté sobre todo */
 }
 
 </style>
