@@ -249,6 +249,7 @@ const modalTitle = ref('');
 const modalInstance = ref(null);
 const modalErrorInstance = ref(null);
 const modalPreguntaInstance = ref(null);
+const registrosEditados = ref([]);
 
 const selectedOrdenId = ref(null);
 const selectedNumeroOrden = ref(null);
@@ -272,16 +273,18 @@ const loading_msg = ref('');
 // ✅ Función para guardar un registro de orden de compra
 const guardar_registro_estado_oc = async () => {
     try {
+        registrosEditados.value = lista_ordenes.value.filter(orden => orden.editado);
+        if (registrosEditados.value.length === 0) {
+            msg.value = "No hay cambios para guardar.";
+            modalTitle.value = "Información";
+            modalInstance.value.show();
+            return;
+        }
 
         const response = await axios.post(
             `${apiUrl}/guardar_registro_estado_oc`, 
             {
-                oc: selectedNumeroOrden.value,
-                enviada_a_aprobar: selectedEnviadaAprobar.value,
-                enviada_al_proveedor: selectedEnviadaProveedor.value,
-                confirmada_por_proveedor: selectedConfirmadaProveedor.value,
-                fecha_envio_al_proveedor: selectedFechaEnvioProveedor.value,
-                observaciones: selectedObservaciones.value,
+                ordenes: registrosEditados.value
             },
             {
                 headers: {
@@ -289,11 +292,11 @@ const guardar_registro_estado_oc = async () => {
                 }
             }
         );
-        console.log(response);
         if (response.status === 200) {
             msg.value = response.data.message;
             modalTitle.value = "Información.";
             modalInstance.value.show();
+            lista_ordenes.value.forEach(orden => orden.editado = false); // Resetear estado de edición
         }
 
     } catch (error) {
@@ -343,10 +346,11 @@ const get_orden_compra_data = async () => {
                 }
             }
         );
-        console.log(response);
         if (response.status === 200) {
             msg.value = response.data.message;
-            lista_ordenes.value = response.data.data.registros;
+            lista_ordenes.value = response.data.data.registros.map(
+                orden => ({... orden, editado: false})
+            );
             total_paginas.value = response.data.data.total_pag;
             total_registros.value = response.data.data.total_registros;
         }
@@ -449,27 +453,38 @@ const selectRow = (orden) => {
     selectedEnviadaProveedor.value = orden.enviada_a_proveedor;
     selectedConfirmadaProveedor.value = orden.confirmada_por_proveedor;
     selectedFechaEnvioProveedor.value = orden.fecha_envio_proveedor;
-    selectedObservaciones.value = orden.observaciones.trim();
+    if (orden.observaciones) {
+        selectedObservaciones.value = orden.observaciones.trim();
+    }
+};
+// ✅ Función para marcar un registro como editado
+const marcarEditado = (orden) => {
+    orden.editado = true;
 };
 // ✅ Función para actualizar el valor del select enviado a aprobar
 const updateEnviadaAprobar = (orden) => {
     selectedEnviadaAprobar.value = orden.enviada_a_aprobar;
+    marcarEditado(orden);
 };
 // ✅ Función para actualizar el valor del select enviado a proveedor
 const updateEnviadaProveedor = (orden) => {
     selectedEnviadaProveedor.value = orden.enviada_a_proveedor;
+    marcarEditado(orden);
 };
 // ✅ Función para actualizar el valor del select confirmado a aprobar
 const updateConfirmadaProveedor = (orden) => {
     selectedConfirmadaProveedor.value = orden.confirmada_por_proveedor;
+    marcarEditado(orden);
 };
 // ✅ Función para actualizar el valor de la fecha envío proveedor
 const updateFecha = (orden) => {
     selectedFechaEnvioProveedor.value = orden.fecha_envio_proveedor;
+    marcarEditado(orden);
 };
 // ✅ Función para actualizar el valor del textarea
 const updateTextArea = (orden) => {
     selectedObservaciones.value = orden.observaciones;
+    marcarEditado(orden);
 };
 // ✅ Función para limpiar los campos del formulario de cotización
 const limpiarCampos = () => {
