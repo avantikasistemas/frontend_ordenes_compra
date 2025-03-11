@@ -607,7 +607,7 @@ body {
     width: 100%;
     border: 1px solid #e5e7eb;
     padding: 8px;
-    font-size: 0.8rem; /* Hacer la fuente más pequeña */
+    font-size: 0.7rem; /* Hacer la fuente más pequeña */
     height: 30px; /* Reducir la altura */
 }
 
