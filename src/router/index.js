@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '@/views/MainView.vue';
+import OrdenCompraNacionalView from '@/views/OrdenCompraNacionalView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {path: '/', name: 'main', component: MainView},
+    {path: '/orden-compra-nacional', name: 'orden-compra-nacional', component: OrdenCompraNacionalView},
   ]
 })
 
