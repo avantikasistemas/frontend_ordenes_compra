@@ -4,61 +4,87 @@
             <img :src="logo" :alt="logo">
             <h1>CONTROL DE ESTADO DE ORDENES DE COMPRA</h1>
         </div>
-        <div class="form-section">
-            <h2>Consultar</h2>
-            <div class="form-grid">
-                <div>
-                    <label for="oc">OC:</label>
-                    <input type="number" id="oc" class="form-control" v-model="oc">
-                </div>
-                <div>
-                    <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
-                    <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde">
-                </div>
-                <div>
-                    <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
-                    <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta">
-                </div>
-                <div>
-                    <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
-                    <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" >
-                        <option :value="null">Seleccione Estado</option>
-                        <option :value="1">SI</option>
-                        <option :value="0">NO</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="usuario">Usuario:</label>
-                    <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario">
-                        <option :value="null">Seleccione Usuario</option>
-                        <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
-                    <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" >
-                        <option :value="null">Seleccione Estado</option>
-                        <option :value="1">SI</option>
-                        <option :value="0">NO</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
-                    <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" >
-                        <option :value="null">Seleccione Estado</option>
-                        <option :value="1">SI</option>
-                        <option :value="0">NO</option>
-                    </select>
+        <!-- Acordeón de filtros -->
+        <div class="accordion" id="filterAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFilters">
+                    <button 
+                        class="accordion-button collapsed" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapseFilters" 
+                        aria-expanded="false" 
+                        aria-controls="collapseFilters"
+                        >
+                        Filtros
+                    </button>
+                </h2>
+                <div 
+                    id="collapseFilters" 
+                    class="accordion-collapse collapse" 
+                    aria-labelledby="headingFilters" 
+                    data-bs-parent="#filterAccordion"
+                >
+                    <div class="accordion-body">
+                        <div class="filter-container">
+                            <h2>Consultar</h2>
+                            <div class="form-grid">
+                                <div>
+                                    <label for="oc">OC:</label>
+                                    <input type="number" id="oc" class="form-control" v-model="oc">
+                                </div>
+                                <div>
+                                    <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
+                                    <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde">
+                                </div>
+                                <div>
+                                    <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
+                                    <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta">
+                                </div>
+                                <div>
+                                    <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
+                                    <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" >
+                                        <option :value="null">Seleccione Estado</option>
+                                        <option :value="1">SI</option>
+                                        <option :value="0">NO</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="usuario">Usuario:</label>
+                                    <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario">
+                                        <option :value="null">Seleccione Usuario</option>
+                                        <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
+                                    <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" >
+                                        <option :value="null">Seleccione Estado</option>
+                                        <option :value="1">SI</option>
+                                        <option :value="0">NO</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
+                                    <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" >
+                                        <option :value="null">Seleccione Estado</option>
+                                        <option :value="1">SI</option>
+                                        <option :value="0">NO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons">
+                            <button class="consultar" @click="get_orden_compra_data">Consultar</button>
+                            <button class="exportar" @click="handleGetRegistros">Exportar</button>
+                            <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
+                            <button class="limpiar" @click="limpiarCampos">Limpiar</button>
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="buttons">
-            <button class="consultar" @click="get_orden_compra_data">Consultar</button>
-            <button class="exportar" @click="handleGetRegistros">Exportar</button>
-            <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
-            <button class="limpiar" @click="limpiarCampos">Limpiar</button>
-        </div>   
-    </div>
 
     <div class="container-n">
         <div class="table-container">
@@ -69,6 +95,7 @@
                         <th># de OC</th>
                         <th>Fecha de OC</th>
                         <th>Nombre del proveedor</th>
+                        <th>Estado OC</th>
                         <th>¿Aprobada?</th>
                         <th>¿Enviada a aprobar?</th>
                         <th>¿Enviada al proveedor?</th>
@@ -85,6 +112,7 @@
                         <td>{{ orden.numero }}</td>
                         <td>{{ orden.fecha_orden_compra }}</td>
                         <td>{{ orden.proveedor }}</td>
+                        <td>{{ orden.estado }}</td>
                         <td>{{ orden.autorizada }}</td>
                         <td>
                             <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
@@ -534,12 +562,34 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.accordion {
+  margin-top: 1px;
+}
+
+.btn-acordeon {
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.accordion-button{
+    font-size: 14px;
+    padding: 10px;
+}
+
+.accordion-body .filter-container h2 {
+    font-size: 1.2rem;
+}
+
 .form-container {
     position: sticky;
     top: 0;
     background-color: #ffffff; /* Asegura que el fondo sea sólido */
     z-index: 1000; /* Para que esté por encima del contenido al hacer scroll */
-    padding: 32px;
+    padding: 16px;
     border-bottom: 2px solid #e5e7eb; /* Línea divisoria */
     width: 100%;
     display: flex;
@@ -549,7 +599,7 @@ body {
 
 .container-n {
     width: 100%;
-    height: calc(100vh - 230px); /* Ajusta la altura para que la tabla ocupe el espacio restante */
+    height: calc(100vh - 120px); /* Ajusta la altura para que la tabla ocupe el espacio restante */
     padding: 16px;
     background-color: #ffffff;
     display: flex;
@@ -629,6 +679,7 @@ body {
 .buttons .consultar {
     background-color: #ffc300;
     border-radius: 20px;
+    transition: 0.3s;
 }
 .buttons .consultar:hover {
     background-color: #ffd858;
@@ -636,6 +687,7 @@ body {
 .buttons .exportar {
     background-color: #808080;
     border-radius: 20px;
+    transition: 0.3s;
 }
 .buttons .exportar:hover {
     background-color: rgb(188, 188, 188);
@@ -643,6 +695,7 @@ body {
 .buttons .guardar {
     background-color: #191919;
     border-radius: 20px;
+    transition: 0.3s;
 }
 .buttons .guardar:hover {
     background-color: #616161;
@@ -650,6 +703,7 @@ body {
 .buttons .limpiar {
     background-color: #9b3460;
     border-radius: 20px;
+    transition: 0.3s;
 }
 .buttons .limpiar:hover {
     background-color: #cf3476;
@@ -681,7 +735,7 @@ th, td {
     border: 1px solid #e5e7eb;
     padding: 8px;
     text-align: left;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
 }
 th {
     background-color: #e5e7eb;
