@@ -72,6 +72,22 @@
                                         <option :value="0">NO</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <label for="estado_orden">Estado:</label>
+                                    <select id="estado_orden" class="form-control" v-model="estado_orden" >
+                                        <option :value="null">Seleccione Estado</option>
+                                        <option :value="1">ANULADO</option>
+                                        <option :value="0">VIGENTE</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="enviada_a_aprobar">Envíada a aprobar ¿Sí – No?:</label>
+                                    <select id="enviada_a_aprobar" class="form-control" v-model="enviada_a_aprobar" >
+                                        <option :value="null">Seleccione Estado</option>
+                                        <option :value="1">SI</option>
+                                        <option :value="0">NO</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="buttons">
@@ -96,8 +112,8 @@
                         <th>Fecha de OC</th>
                         <th>Nombre del proveedor</th>
                         <th>Estado OC</th>
-                        <th>¿Aprobada?</th>
                         <th>¿Enviada a aprobar?</th>
+                        <th>¿Aprobada?</th>
                         <th>¿Enviada al proveedor?</th>
                         <th>¿Confirmado por el proveedor?</th>
                         <th>Fecha de envío al proveedor</th>
@@ -113,7 +129,6 @@
                         <td>{{ orden.fecha_orden_compra }}</td>
                         <td>{{ orden.proveedor }}</td>
                         <td>{{ orden.estado }}</td>
-                        <td>{{ orden.autorizada }}</td>
                         <td>
                             <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
                                 <option :value="null">Seleccione Estado</option>
@@ -121,6 +136,7 @@
                                 <option :value="0">NO</option>
                             </select>
                         </td>
+                        <td>{{ orden.autorizada }}</td>
                         <td>
                             <select v-model="orden.enviada_a_proveedor" class="form-control" @change="updateEnviadaProveedor(orden)">
                                 <option :value="null">Seleccione Estado</option>
@@ -271,6 +287,8 @@ const lista_usuarios = ref([]);
 const selectUsuario = ref(null);
 const fechaDesdeFormateada = ref(null);
 const fechaHastaFormateada = ref(null);
+const estado_orden = ref(null);
+const enviada_a_aprobar = ref(null);
 const lista_ordenes = ref([]);
 
 const modalTitle = ref('');
@@ -354,6 +372,12 @@ const get_orden_compra_data = async () => {
         if (confirmada_proveedor.value != null){
             confirmada_proveedor.value = confirmada_proveedor.value.toString();
         }
+        if (estado_orden.value != null){
+            estado_orden.value = estado_orden.value.toString();
+        }
+        if (enviada_a_aprobar.value != null){
+            enviada_a_aprobar.value = enviada_a_aprobar.value.toString();
+        }
 
         const response = await axios.post(
             `${apiUrl}/get_orden_compra_data`, 
@@ -365,6 +389,8 @@ const get_orden_compra_data = async () => {
                 usuario: selectUsuario.value,
                 enviada_proveedor: enviada_proveedor.value,
                 confirmada_proveedor: confirmada_proveedor.value,
+                estado_orden: estado_orden.value,
+                enviada_a_aprobar: enviada_a_aprobar.value,
                 limit: parseInt(limit.value),
                 position: parseInt(position.value),
             },
@@ -377,8 +403,15 @@ const get_orden_compra_data = async () => {
         if (response.status === 200) {
             msg.value = response.data.message;
             lista_ordenes.value = response.data.data.registros.map(
-                orden => ({... orden, editado: false})
-            );
+                orden => (
+                    {
+                        ... orden, 
+                        editado: false,
+                        enviada_a_aprobar: orden.enviada_a_aprobar,
+                        enviada_a_proveedor: orden.enviada_a_proveedor,
+                        confirmada_por_proveedor: orden.confirmada_por_proveedor,
+                    }
+                ));
             total_paginas.value = response.data.data.total_pag;
             total_registros.value = response.data.data.total_registros;
         }
@@ -523,6 +556,8 @@ const limpiarCampos = () => {
   enviada_proveedor.value = null;
   selectUsuario.value = null;
   confirmada_proveedor.value = null;
+  estado_orden.value = null;
+  enviada_a_aprobar.value = null;
   lista_ordenes.value = [];
   total_registros.value = 0;
   position.value = 1;
