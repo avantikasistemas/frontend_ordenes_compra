@@ -29,64 +29,68 @@
                         <div class="filter-container">
                             <h2>Consultar</h2>
                             <div class="form-grid">
-                                <div>
-                                    <label for="oc">OC:</label>
-                                    <input type="number" id="oc" class="form-control" v-model="oc">
+                                <div class="form-row">
+                                    <div>
+                                        <label for="oc">OC:</label>
+                                        <input type="number" id="oc" class="form-control" v-model="oc" @input="resetearPaginacion">
+                                    </div>
+                                    <div>
+                                        <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
+                                        <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde" @input="resetearPaginacion">
+                                    </div>
+                                    <div>
+                                        <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
+                                        <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta" @input="resetearPaginacion">
+                                    </div>
+                                    <div>
+                                        <label for="usuario">Usuario:</label>
+                                        <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Usuario</option>
+                                            <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="estado_orden">Estado:</label>
+                                        <select id="estado_orden" class="form-control" v-model="estado_orden" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Estado</option>
+                                            <option :value="1">ANULADO</option>
+                                            <option :value="0">VIGENTE</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
-                                    <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde">
-                                </div>
-                                <div>
-                                    <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
-                                    <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta">
-                                </div>
-                                <div>
-                                    <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
-                                    <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" >
-                                        <option :value="null">Seleccione Estado</option>
-                                        <option :value="1">SI</option>
-                                        <option :value="0">NO</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="usuario">Usuario:</label>
-                                    <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario">
-                                        <option :value="null">Seleccione Usuario</option>
-                                        <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
-                                    <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" >
-                                        <option :value="null">Seleccione Estado</option>
-                                        <option :value="1">SI</option>
-                                        <option :value="0">NO</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
-                                    <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" >
-                                        <option :value="null">Seleccione Estado</option>
-                                        <option :value="1">SI</option>
-                                        <option :value="0">NO</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="estado_orden">Estado:</label>
-                                    <select id="estado_orden" class="form-control" v-model="estado_orden" >
-                                        <option :value="null">Seleccione Estado</option>
-                                        <option :value="1">ANULADO</option>
-                                        <option :value="0">VIGENTE</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="enviada_a_aprobar">Envíada a aprobar ¿Sí – No?:</label>
-                                    <select id="enviada_a_aprobar" class="form-control" v-model="enviada_a_aprobar" >
-                                        <option :value="null">Seleccione Estado</option>
-                                        <option :value="1">SI</option>
-                                        <option :value="0">NO</option>
-                                    </select>
+                                <div class="form-row">
+                                    <div>
+                                        <label for="enviada_a_aprobar">Envíada a aprobar ¿Sí – No?:</label>
+                                        <select id="enviada_a_aprobar" class="form-control" v-model="enviada_a_aprobar" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Estado</option>
+                                            <option :value="1">SI</option>
+                                            <option :value="0">NO</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
+                                        <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Estado</option>
+                                            <option :value="1">SI</option>
+                                            <option :value="0">NO</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
+                                        <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Estado</option>
+                                            <option :value="1">SI</option>
+                                            <option :value="0">NO</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
+                                        <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" @input="resetearPaginacion">
+                                            <option :value="null">Seleccione Estado</option>
+                                            <option :value="1">SI</option>
+                                            <option :value="0">NO</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -443,6 +447,12 @@ const exportar_excel = async () => {
         if (confirmada_proveedor.value != null){
             confirmada_proveedor.value = confirmada_proveedor.value.toString();
         }
+        if (estado_orden.value != null){
+            estado_orden.value = estado_orden.value.toString();
+        }
+        if (enviada_a_aprobar.value != null){
+            enviada_a_aprobar.value = enviada_a_aprobar.value.toString();
+        }
 
         const response = await axios.post(
             `${apiUrl}/generar_excel`, 
@@ -454,6 +464,8 @@ const exportar_excel = async () => {
                 usuario: selectUsuario.value,
                 enviada_proveedor: enviada_proveedor.value,
                 confirmada_proveedor: confirmada_proveedor.value,
+                estado_orden: estado_orden.value,
+                enviada_a_aprobar: enviada_a_aprobar.value,
             },
             {
                 headers: {
@@ -552,6 +564,8 @@ const limpiarCampos = () => {
   oc.value = '';
   fecha_oc_desde.value = '';
   fecha_oc_hasta.value = '';
+  fechaDesdeFormateada.value = null;
+  fechaHastaFormateada.value = null;
   solicitud_aprobacion.value = null;
   enviada_proveedor.value = null;
   selectUsuario.value = null;
@@ -567,6 +581,10 @@ const limpiarCampos = () => {
 const changePage = async (newPosition) => {
   position.value = newPosition;
   await get_orden_compra_data(); // Vuelve a cargar los datos con el nuevo límite y posición
+};
+// ✅ Función para resetear paginacion cuando haya cambio en los filtros
+const resetearPaginacion = () => {
+    position.value = 1;
 };
 // ✅ Función para realizar carga de pantalla de espera.
 const handleGetRegistros = async () => {
@@ -668,9 +686,18 @@ body {
     margin-bottom: 6px;
 }
 .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.form-row {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.form-row:last-child {
+    grid-template-columns: repeat(4, 1fr);
 }
 @media (min-width: 768px) {
     .form-grid {
