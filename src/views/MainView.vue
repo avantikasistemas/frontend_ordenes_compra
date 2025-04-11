@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <div class="buttons">
-                            <button class="consultar" @click="get_orden_compra_data">Consultar</button>
+                            <button class="consultar" @click="handleGetDatos">Consultar</button>
                             <button class="exportar" @click="handleGetRegistros">Exportar</button>
                             <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
                             <button class="limpiar" @click="limpiarCampos">Limpiar</button>
@@ -594,6 +594,18 @@ const handleGetRegistros = async () => {
       await exportar_excel(); // Llama a la función que obtiene los correos
   } catch (error) {
       console.error('Error al exportar excel:', error);
+  } finally {
+    loading.value = false; // Oculta el spinner al finalizar la operación
+  }
+};
+// ✅ Función para realizar carga de pantalla de espera.
+const handleGetDatos = async () => {
+  try {
+    loading.value = true; // Mostrar el spinner antes de la llamada API
+    loading_msg.value = 'Consultando datos, por favor espere...';
+      await get_orden_compra_data(); // Llama a la función que obtiene los correos
+  } catch (error) {
+      console.error('Error al consultar datos:', error);
   } finally {
     loading.value = false; // Oculta el spinner al finalizar la operación
   }
