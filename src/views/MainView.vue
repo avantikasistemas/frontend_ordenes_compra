@@ -1,281 +1,284 @@
 <template>
-    <div class="form-container">
-        <div class="header">
-            <img :src="logo" :alt="logo">
-            <h1>CONTROL DE ESTADO DE ORDENES DE COMPRA</h1>
-        </div>
-        <!-- Acordeón de filtros -->
-        <div class="accordion" id="filterAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingFilters">
-                    <button 
-                        class="accordion-button collapsed" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapseFilters" 
-                        aria-expanded="false" 
-                        aria-controls="collapseFilters"
-                        >
-                        Filtros
-                    </button>
-                </h2>
-                <div 
-                    id="collapseFilters" 
-                    class="accordion-collapse collapse" 
-                    aria-labelledby="headingFilters" 
-                    data-bs-parent="#filterAccordion"
-                >
-                    <div class="accordion-body">
-                        <div class="filter-container">
-                            <h2>Consultar</h2>
-                            <div class="form-grid">
-                                <div class="form-row">
-                                    <div>
-                                        <label for="oc">OC:</label>
-                                        <input type="number" id="oc" class="form-control" v-model="oc" @input="resetearPaginacion">
+    <LayoutView>
+        <div class="form-container">
+            <div class="header">
+                <img :src="logo" :alt="logo">
+                <h1>CONTROL DE ESTADO DE ORDENES DE COMPRA</h1>
+            </div>
+            <!-- Acordeón de filtros -->
+            <div class="accordion" id="filterAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFilters">
+                        <button 
+                            class="accordion-button collapsed" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseFilters" 
+                            aria-expanded="false" 
+                            aria-controls="collapseFilters"
+                            >
+                            Filtros
+                        </button>
+                    </h2>
+                    <div 
+                        id="collapseFilters" 
+                        class="accordion-collapse collapse" 
+                        aria-labelledby="headingFilters" 
+                        data-bs-parent="#filterAccordion"
+                    >
+                        <div class="accordion-body">
+                            <div class="filter-container">
+                                <h2>Consultar</h2>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <div>
+                                            <label for="oc">OC:</label>
+                                            <input type="number" id="oc" class="form-control" v-model="oc" @input="resetearPaginacion">
+                                        </div>
+                                        <div>
+                                            <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
+                                            <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde" @input="resetearPaginacion">
+                                        </div>
+                                        <div>
+                                            <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
+                                            <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta" @input="resetearPaginacion">
+                                        </div>
+                                        <div>
+                                            <label for="usuario">Usuario:</label>
+                                            <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Usuario</option>
+                                                <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="estado_orden">Estado:</label>
+                                            <select id="estado_orden" class="form-control" v-model="estado_orden" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Estado</option>
+                                                <option :value="1">ANULADO</option>
+                                                <option :value="0">VIGENTE</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label for="fecha_oc_desde">Fecha de la OC Desde:</label>
-                                        <input type="date" id="fecha_oc_desde" v-model="fecha_oc_desde" @input="resetearPaginacion">
-                                    </div>
-                                    <div>
-                                        <label for="fecha_oc_hasta">Fecha de la OC Hasta:</label>
-                                        <input type="date" id="fecha_oc_hasta" v-model="fecha_oc_hasta" @input="resetearPaginacion">
-                                    </div>
-                                    <div>
-                                        <label for="usuario">Usuario:</label>
-                                        <select id="usuario" class="form-control form-control-sm mb-2" v-model="selectUsuario" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Usuario</option>
-                                            <option v-for="usuario in lista_usuarios" :value="usuario.usuario">{{ usuario.des_usuario }}</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="estado_orden">Estado:</label>
-                                        <select id="estado_orden" class="form-control" v-model="estado_orden" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Estado</option>
-                                            <option :value="1">ANULADO</option>
-                                            <option :value="0">VIGENTE</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div>
-                                        <label for="enviada_a_aprobar">Envíada a aprobar ¿Sí – No?:</label>
-                                        <select id="enviada_a_aprobar" class="form-control" v-model="enviada_a_aprobar" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Estado</option>
-                                            <option :value="1">SI</option>
-                                            <option :value="0">NO</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
-                                        <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Estado</option>
-                                            <option :value="1">SI</option>
-                                            <option :value="0">NO</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
-                                        <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Estado</option>
-                                            <option :value="1">SI</option>
-                                            <option :value="0">NO</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
-                                        <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" @input="resetearPaginacion">
-                                            <option :value="null">Seleccione Estado</option>
-                                            <option :value="1">SI</option>
-                                            <option :value="0">NO</option>
-                                        </select>
+                                    <div class="form-row">
+                                        <div>
+                                            <label for="enviada_a_aprobar">Envíada a aprobar ¿Sí – No?:</label>
+                                            <select id="enviada_a_aprobar" class="form-control" v-model="enviada_a_aprobar" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Estado</option>
+                                                <option :value="1">SI</option>
+                                                <option :value="0">NO</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="solicitud_aprobacion">Aprobada ¿Sí – No?:</label>
+                                            <select id="solicitud_aprobacion" class="form-control" v-model="solicitud_aprobacion" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Estado</option>
+                                                <option :value="1">SI</option>
+                                                <option :value="0">NO</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="enviada_proveedor">Enviada al Proveedor: ¿Sí – No?:</label>
+                                            <select id="enviada_proveedor" class="form-control" v-model="enviada_proveedor" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Estado</option>
+                                                <option :value="1">SI</option>
+                                                <option :value="0">NO</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="confirmada_proveedor">Confirmada por el Proveedor ¿Sí – No?:</label>
+                                            <select id="confirmada_proveedor" class="form-control" v-model="confirmada_proveedor" @input="resetearPaginacion">
+                                                <option :value="null">Seleccione Estado</option>
+                                                <option :value="1">SI</option>
+                                                <option :value="0">NO</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="buttons">
+                                <button class="consultar" @click="handleGetDatos">Consultar</button>
+                                <button class="exportar" @click="handleGetRegistros">Exportar</button>
+                                <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
+                                <button class="limpiar" @click="limpiarCampos">Limpiar</button>
+                            </div>
                         </div>
-                        <div class="buttons">
-                            <button class="consultar" @click="handleGetDatos">Consultar</button>
-                            <button class="exportar" @click="handleGetRegistros">Exportar</button>
-                            <button class="guardar" @click="guardar_registro_estado_oc">Guardar</button>
-                            <button class="limpiar" @click="limpiarCampos">Limpiar</button>
                         </div>
                     </div>
+                </div>
+            </div>
+    
+        <div class="container-n">
+            <div class="table-container">
+                <h3 class="h3-title">NÚMERO DE REGISTROS</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th># de OC</th>
+                            <th>Fecha de OC</th>
+                            <th>Nombre del proveedor</th>
+                            <th>Estado OC</th>
+                            <th>¿Enviada a aprobar?</th>
+                            <th>¿Aprobada?</th>
+                            <th>¿Enviada al proveedor?</th>
+                            <th>¿Confirmado por el proveedor?</th>
+                            <th>Fecha de envío al proveedor</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="lista_ordenes.length === 0">
+                            <td colspan="9" class="no-registros">No hay registros disponibles</td>
+                        </tr>
+                        <tr v-else v-for="orden in lista_ordenes" :key="orden.consecutivo" @click="selectRow(orden)" :class="{ 'selected-row': orden.consecutivo === selectedOrdenId }">
+                            <td>{{ orden.numero }}</td>
+                            <td>{{ orden.fecha_orden_compra }}</td>
+                            <td>{{ orden.proveedor }}</td>
+                            <td>{{ orden.estado }}</td>
+                            <td>
+                                <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
+                                    <option :value="null">Seleccione Estado</option>
+                                    <option :value="1">SI</option>
+                                    <option :value="0">NO</option>
+                                </select>
+                            </td>
+                            <td>{{ orden.autorizada }}</td>
+                            <td>
+                                <select v-model="orden.enviada_a_proveedor" class="form-control" @change="updateEnviadaProveedor(orden)">
+                                    <option :value="null">Seleccione Estado</option>
+                                    <option :value="1">SI</option>
+                                    <option :value="0">NO</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select v-model="orden.confirmada_por_proveedor" class="form-control" @change="updateConfirmadaProveedor(orden)">
+                                    <option :value="null">Seleccione Estado</option>
+                                    <option :value="1">SI</option>
+                                    <option :value="0">NO</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="date" v-model="orden.fecha_envio_proveedor" @change="updateFecha(orden)" class="form-control" :min="orden.fecha_orden_compra">
+                            </td>
+                            <td>
+                                <textarea class="form-control" v-model="orden.observaciones" @change="updateTextArea(orden)"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" v-if="total_registros > 15">
+              <label for="records-per-page">Registros por página:</label>
+              <select 
+                id="records-per-page" 
+                v-model="limit" 
+                @change="changePage(1)"
+              >
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+              </select>
+              <button 
+                :disabled="position <= 1" 
+                @click="changePage(1)"
+              >
+                Primera
+              </button>
+              
+              <button 
+                :disabled="position <= 1" 
+                @click="changePage(position - 1)"
+              >
+                Anterior
+              </button>
+              
+              <span>Página {{ position }} de {{ total_paginas }}</span>
+              
+              <button 
+                :disabled="position >= total_paginas" 
+                @click="changePage(position + 1)"
+              >
+                Siguiente
+              </button>
+              
+              <button 
+                :disabled="position >= total_paginas" 
+                @click="changePage(total_paginas)"
+              >
+                Última
+              </button>
+            </div>
+        </div>
+    
+        <!-- Modal de éxito -->
+        <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="exitoModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exitoModalLabel">{{ modalTitle }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ msg }}</p>                    
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>
         </div>
-
-    <div class="container-n">
-        <div class="table-container">
-            <h3 class="h3-title">NÚMERO DE REGISTROS</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th># de OC</th>
-                        <th>Fecha de OC</th>
-                        <th>Nombre del proveedor</th>
-                        <th>Estado OC</th>
-                        <th>¿Enviada a aprobar?</th>
-                        <th>¿Aprobada?</th>
-                        <th>¿Enviada al proveedor?</th>
-                        <th>¿Confirmado por el proveedor?</th>
-                        <th>Fecha de envío al proveedor</th>
-                        <th>Observaciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="lista_ordenes.length === 0">
-                        <td colspan="9" class="no-registros">No hay registros disponibles</td>
-                    </tr>
-                    <tr v-else v-for="orden in lista_ordenes" :key="orden.consecutivo" @click="selectRow(orden)" :class="{ 'selected-row': orden.consecutivo === selectedOrdenId }">
-                        <td>{{ orden.numero }}</td>
-                        <td>{{ orden.fecha_orden_compra }}</td>
-                        <td>{{ orden.proveedor }}</td>
-                        <td>{{ orden.estado }}</td>
-                        <td>
-                            <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
-                                <option :value="null">Seleccione Estado</option>
-                                <option :value="1">SI</option>
-                                <option :value="0">NO</option>
-                            </select>
-                        </td>
-                        <td>{{ orden.autorizada }}</td>
-                        <td>
-                            <select v-model="orden.enviada_a_proveedor" class="form-control" @change="updateEnviadaProveedor(orden)">
-                                <option :value="null">Seleccione Estado</option>
-                                <option :value="1">SI</option>
-                                <option :value="0">NO</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select v-model="orden.confirmada_por_proveedor" class="form-control" @change="updateConfirmadaProveedor(orden)">
-                                <option :value="null">Seleccione Estado</option>
-                                <option :value="1">SI</option>
-                                <option :value="0">NO</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="date" v-model="orden.fecha_envio_proveedor" @change="updateFecha(orden)" class="form-control" :min="orden.fecha_orden_compra">
-                        </td>
-                        <td>
-                            <textarea class="form-control" v-model="orden.observaciones" @change="updateTextArea(orden)"></textarea>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination" v-if="total_registros > 15">
-          <label for="records-per-page">Registros por página:</label>
-          <select 
-            id="records-per-page" 
-            v-model="limit" 
-            @change="changePage(1)"
-          >
-            <option value="15">15</option>
-            <option value="30">30</option>
-            <option value="50">50</option>
-          </select>
-          <button 
-            :disabled="position <= 1" 
-            @click="changePage(1)"
-          >
-            Primera
-          </button>
-          
-          <button 
-            :disabled="position <= 1" 
-            @click="changePage(position - 1)"
-          >
-            Anterior
-          </button>
-          
-          <span>Página {{ position }} de {{ total_paginas }}</span>
-          
-          <button 
-            :disabled="position >= total_paginas" 
-            @click="changePage(position + 1)"
-          >
-            Siguiente
-          </button>
-          
-          <button 
-            :disabled="position >= total_paginas" 
-            @click="changePage(total_paginas)"
-          >
-            Última
-          </button>
-        </div>
-    </div>
-
-    <!-- Modal de éxito -->
-    <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="exitoModal">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+    
+        <!-- Modal de pregunta -->
+        <div class="modal fade" id="preguntaModal" tabindex="-1" aria-labelledby="preguntaModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="preguntaModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exitoModalLabel">{{ modalTitle }}</h5>
+                    <h5 class="modal-title" id="preguntaModalLabel">Registro Existente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>{{ msg }}</p>                    
+                    {{msg}}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary btn-pregunta-modal" @click="actualizarCotizacion">Si</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal de pregunta -->
-    <div class="modal fade" id="preguntaModal" tabindex="-1" aria-labelledby="preguntaModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="preguntaModal">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="preguntaModalLabel">Registro Existente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {{msg}}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-pregunta-modal" @click="actualizarCotizacion">Si</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de error -->
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="errorModal">
-      <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="errorModalLabel">Error</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  {{ errorMsg }}
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    
+        <!-- Modal de error -->
+        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="errorModal">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      {{ errorMsg }}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
               </div>
           </div>
-      </div>
-    </div>
-
-    <!-- Overlay de carga -->
-    <div v-if="loading" class="loading-overlay">
-        <div class="spinner-border text-light" role="status">
-            <span class="visually-hidden"></span>
         </div>
-        <p class="mt-2 text-light">{{ loading_msg }}</p>
-    </div>
+    
+        <!-- Overlay de carga -->
+        <div v-if="loading" class="loading-overlay">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+            <p class="mt-2 text-light">{{ loading_msg }}</p>
+        </div>
+    </LayoutView>
 
 </template>
 
 <script setup>
 
 import { ref, onMounted } from 'vue';
+import LayoutView from '../views/Layouts/LayoutView.vue';
 import axios from 'axios';
 import { Modal } from 'bootstrap';
 import logo from '@/assets/logo.png';
