@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '@/views/MainView.vue';
 import OcNacionalView from '@/views/OcNacionalView.vue';
+import MainViewAdmin from '@/views/MainViewAdmin.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {path: '/', name: 'main', component: MainView},
     {path: '/oc_nacional', name: 'oc_nacional', component: OcNacionalView},
+    {path: '/control-administrativo', name: 'control-administrativo', component: MainViewAdmin}
   ]
 })
 
