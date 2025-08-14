@@ -122,6 +122,7 @@
                         <th>¿Confirmado por el proveedor?</th>
                         <th>Fecha de envío al proveedor</th>
                         <th>Observaciones</th>
+                        <th>Seguimiento</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -160,6 +161,18 @@
                         </td>
                         <td>
                             <textarea class="form-control" v-model="orden.observaciones" @change="updateTextArea(orden)"></textarea>
+                        </td>
+                        <td>
+                            <span 
+                                class="seguimiento-icono" 
+                                @click="abrirModalSeguimiento(orden)" 
+                                title="Ver seguimiento"
+                            >
+                                <!-- Icono lupa SVG -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#808080" viewBox="0 0 24 24">
+                                  <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 2a6 6 0 1 1 0 12A6 6 0 0 1 10 4zm8.707 15.293-4.1-4.1A7.963 7.963 0 0 1 10 18a8 8 0 1 1 8-8c0 1.61-.48 3.11-1.393 4.393l4.1 4.1a1 1 0 0 1-1.414 1.414z"/>
+                                </svg>
+                            </span>
                         </td>
                     </tr>
                 </tbody>
@@ -246,7 +259,7 @@
     </div>
 
     <!-- Modal de error -->
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="errorModal">
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="errorModal" style="z-index: 12000;">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
               <div class="modal-header">
@@ -261,6 +274,79 @@
               </div>
           </div>
       </div>
+    </div>
+
+    <!-- Modal de seguimiento -->
+    <div class="modal fade" id="seguimientoModal" tabindex="-1" aria-labelledby="seguimientoModalLabel" aria-hidden="true" data-bs-backdrop="static" ref="seguimientoModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="seguimientoModalLabel">Seguimiento de Orden de compra #: {{ oc_seguimiento }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Contenedor informativo de la OC -->
+                    <div class="seguimiento-info">
+                        <div><strong>OC:</strong> {{ oc_seguimiento }}</div>
+                        <div><strong>Fecha OC:</strong> {{ fecha_oc_seguimiento }}</div>
+                        <div><strong>Proveedor:</strong> {{ proveedor_seguimiento }}</div>
+                        <div><strong>Estado:</strong> {{ estado_seguimiento }}</div>
+                    </div>
+                    <hr>
+                    <div class="seguimiento-row">
+                        <div>
+                            <label for="usuarioSeguimiento">Usuario:</label>
+                            <select id="usuarioSeguimiento" v-model="usuarioSeguimiento" class="form-select seguimiento-select">
+                                <option value=null>Seleccione usuario</option>
+                                <option value="RODRIGUEZC">RODRIGUEZC</option>
+                                <option value="PCARBONELL">PCARBONELL</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="comentarioSeguimiento">Comentario Seguimiento:</label>
+                            <textarea id="comentarioSeguimiento" v-model="comentarioSeguimiento" class="form-control seguimiento-textarea" placeholder="Escriba un comentario..."></textarea>
+                        </div>
+                        <span class="seguimiento-guardar-icono" @click="guardarSeguimiento" title="Guardar seguimiento">
+                                <!-- Icono guardar cuadrado pequeño (disquete) -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#28a745">
+                                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                    <rect x="7" y="7" width="10" height="6" fill="#fff"/>
+                                    <rect x="9" y="15" width="6" height="2" fill="#fff"/>
+                                    <rect x="10" y="9" width="4" height="2" fill="#28a745"/>
+                                </svg>
+                        </span>
+                    </div>
+                    <hr>
+                    <!-- Tabla de seguimientos si hay información -->
+                    <div v-if="list_seguimientos && list_seguimientos.length > 0" class="seguimiento-tabla-container">
+                        <h6 class="seguimiento-tabla-titulo">Historial de seguimientos</h6>
+                        <div class="seguimiento-tabla-scroll">
+                            <table class="table table-bordered seguimiento-tabla">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Usuario</th>
+                                        <th>Comentario</th>
+                                        <th>Fecha de creación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item, index) in list_seguimientos" :key="item.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td>{{ item.usuario }}</td>
+                                        <td>{{ item.comentario }}</td>
+                                        <td>{{ item.created_at }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Overlay de carga -->
@@ -319,6 +405,17 @@ const errorMsg = ref('');
 
 const loading = ref(false);
 const loading_msg = ref('');
+
+// Modal de seguimiento
+const seguimientoModalInstance = ref(null);
+const oc_seguimiento = ref(null);
+const fecha_oc_seguimiento = ref(null);
+const proveedor_seguimiento = ref('');
+const estado_seguimiento = ref('');
+const list_seguimientos = ref([]);
+
+const usuarioSeguimiento = ref(null);
+const comentarioSeguimiento = ref("");
 
 // ✅ Función para guardar un registro de orden de compra
 const guardar_registro_estado_oc = async () => {
@@ -610,11 +707,87 @@ const handleGetDatos = async () => {
     loading.value = false; // Oculta el spinner al finalizar la operación
   }
 };
+// ✅ Función para guardar un seguimiento a una orden de compra.
+const guardarSeguimiento = async () => {
+    // if (usuarioSeguimiento.value == null || usuarioSeguimiento.value == "" || usuarioSeguimiento.value == "null" || comentarioSeguimiento.value == null || comentarioSeguimiento.value == "") {
+    //     alert('Por favor, complete todos los campos.');
+    //     return;
+    // }
+    try {
+
+        const response = await axios.post(
+            `${apiUrl}/guardar_seguimiento`, 
+            {
+                oc: oc_seguimiento.value,
+                usuario: usuarioSeguimiento.value,
+                comentario: comentarioSeguimiento.value
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                }
+            }
+        );
+        if (response.status === 200) {
+            await cargarDatosSeguimiento();
+            limpiarCamposModal();
+            alert('Seguimiento guardado con éxito.');
+        }
+
+    } catch (error) {
+        console.error('Error al cargar los datos:', error);
+        modalErrorInstance.value.show();
+        errorMsg.value = error.response.data.message;
+    }
+}
+// ✅ Función para abrir el modal de seguimiento
+const abrirModalSeguimiento = async (orden) => {
+    oc_seguimiento.value = orden.numero;
+    fecha_oc_seguimiento.value = orden.fecha_orden_compra;
+    proveedor_seguimiento.value = orden.proveedor;
+    estado_seguimiento.value = orden.estado;
+    if (!seguimientoModalInstance.value) {
+        seguimientoModalInstance.value = new Modal(seguimientoModal);
+    }
+    await cargarDatosSeguimiento();
+    seguimientoModalInstance.value.show();
+};
+
+const limpiarCamposModal = () => {
+    usuarioSeguimiento.value = null;
+    comentarioSeguimiento.value = "";
+};
+
+const cargarDatosSeguimiento = async () => {
+    try {
+        const response = await axios.post(
+            `${apiUrl}/cargar_datos_seguimiento`, 
+            {
+                oc: oc_seguimiento.value
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                }
+            }
+        );
+        if (response.status === 200) {
+            list_seguimientos.value = response.data.data;
+        }
+
+    } catch (error) {
+        console.error('Error al cargar los datos:', error);
+        modalErrorInstance.value.show();
+        errorMsg.value = error.response.data.message;
+    }
+}
+
 // Código que se ejecuta al montar el componente
 onMounted(() => {
   modalInstance.value = new Modal(exitoModal);
   modalErrorInstance.value = new Modal(errorModal);
   modalPreguntaInstance.value = new Modal(preguntaModal);
+  seguimientoModalInstance.value = new Modal(seguimientoModal);
   cargarDatos();
 });
 
@@ -908,4 +1081,86 @@ th {
     z-index: 9999; /* Asegura que esté sobre todo */
 }
 
+/* Contenedor informativo de la OC en la modal de seguimiento */
+.seguimiento-info {
+    display: flex;
+    gap: 32px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 18px;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.seguimiento-info div {
+    min-width: 120px;
+}
+/* Estilos para la row de seguimiento en la modal */
+.seguimiento-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #f8f9fa;
+    margin-bottom: 12px;
+}
+.seguimiento-select {
+    min-width: 160px;
+    max-width: 180px;
+}
+.seguimiento-textarea {
+    flex: 2;
+    min-width: 400px;
+    max-width: 1000px;
+    height: 40px;
+    resize: vertical;
+}
+.seguimiento-guardar-icono {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+.seguimiento-guardar-icono:hover svg {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 2px #28a745);
+}
+
+.seguimiento-icono svg {
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s;
+    vertical-align: middle;
+}
+.seguimiento-icono:hover svg {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 2px #808080);
+}
+
+/* Estilos para la tabla de seguimientos con scroll */
+.seguimiento-tabla-container {
+    margin-top: 18px;
+}
+.seguimiento-tabla-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    /* Para que la tabla ocupe todo el ancho y el scroll sea visible */
+    width: 100%;
+    display: block;
+}
+.seguimiento-tabla {
+    margin-bottom: 0;
+    width: 100%;
+    table-layout: fixed;
+}
+.seguimiento-tabla th, .seguimiento-tabla td {
+    word-break: break-word;
+}
+
+/* Modal de error con z-index alto para superponerse */
+#errorModal {
+    z-index: 12000 !important;
+}
 </style>
