@@ -2,7 +2,8 @@
   <nav class="navbar">
     <div class="navbar-left navbar-links">
       <router-link to="/" class="nav-link">Control de estados ordenes de compra</router-link>
-      <router-link to="/oc_nacional" class="nav-link">Ordenes de compra nacional</router-link>
+      <router-link to="/anular" class="nav-link">Anular ordenes de compra</router-link>
+      <!-- <router-link to="/oc_nacional" class="nav-link">Ordenes de compra nacional</router-link> -->
       <!-- <router-link to="/generico" class="nav-link">Creación de Genéricos</router-link> -->
     </div>
   </nav>

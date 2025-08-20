@@ -1,4 +1,5 @@
 <template>
+<LayoutView>
     <div class="form-container">
         <div class="header">
             <img :src="logo" :alt="logo">
@@ -357,12 +358,15 @@
         <p class="mt-2 text-light">{{ loading_msg }}</p>
     </div>
 
+</LayoutView>
+
 </template>
 
 <script setup>
 
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import LayoutView from '../views/Layouts/LayoutView.vue';
 import { Modal } from 'bootstrap';
 import logo from '@/assets/logo.png';
 import apiUrl from "../../config.js";
