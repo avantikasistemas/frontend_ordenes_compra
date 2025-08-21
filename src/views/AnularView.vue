@@ -13,13 +13,11 @@
                     <label for="usuario">Usuario:</label>
                     <select id="usuario" v-model="usuario" class="form-select seguimiento-select">
                         <option value=null>Seleccione usuario</option>
-                        <option value="JARAUJO">JARAUJO</option>
+                        <option value="MCASALINS">MCASALINS</option>
                         <option value="MMIRANDA">MMIRANDA</option>
                         <option value="NFERNANDEZ">NFERNANDEZ</option>
-                        <option value="NMERCADO">NMERCADO</option>
                         <option value="PCARBONELL">PCARBONELL</option>
                         <option value="RODRIGUEZC">RODRIGUEZC</option>
-                        <option value="YORDONEZ">YORDONEZ</option>
                     </select>
                 </div>
                 <div>
