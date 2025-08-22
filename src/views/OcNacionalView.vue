@@ -103,8 +103,10 @@ const tasa = ref(5000);
 const factor = ref(1.00);
 
 const msg = ref('');
+const error = ref('');
 const errorMsg = ref('');
 const modalTitle = ref('');
+const cargando = ref(false);
 
 const modalInstance = ref(null);
 const modalErrorInstance = ref(null);
