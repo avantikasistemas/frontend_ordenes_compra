@@ -127,7 +127,7 @@
                     </thead>
                     <tbody>
                         <tr v-if="lista_ordenes.length === 0">
-                            <td colspan="9" class="no-registros">No hay registros disponibles</td>
+                            <td colspan="10" class="no-registros">No hay registros disponibles</td>
                         </tr>
                         <tr v-else v-for="orden in lista_ordenes" :key="orden.consecutivo" @click="selectRow(orden)" :class="{ 'selected-row': orden.consecutivo === selectedOrdenId }">
                             <td>{{ orden.numero }}</td>
@@ -224,108 +224,6 @@
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="container-n">
-            <div class="table-container">
-                <h3 class="h3-title">NÚMERO DE REGISTROS</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th># de OC</th>
-                            <th>Fecha de OC</th>
-                            <th>Nombre del proveedor</th>
-                            <th>Estado OC</th>
-                            <th>¿Enviada a aprobar?</th>
-                            <th>¿Aprobada?</th>
-                            <th>¿Enviada al proveedor?</th>
-                            <th>¿Confirmado por el proveedor?</th>
-                            <th>Fecha de envío al proveedor</th>
-                            <th>Observaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-if="lista_ordenes.length === 0">
-                            <td colspan="10" class="no-registros">No hay registros disponibles</td>
-                        </tr>
-                        <tr v-else v-for="orden in lista_ordenes" :key="orden.consecutivo" @click="selectRow(orden)" :class="{ 'selected-row': orden.consecutivo === selectedOrdenId }">
-                            <td>{{ orden.numero }}</td>
-                            <td>{{ orden.fecha_orden_compra }}</td>
-                            <td>{{ orden.proveedor }}</td>
-                            <td>{{ orden.estado }}</td>
-                            <td>
-                                <select v-model="orden.enviada_a_aprobar" class="form-control" @change="updateEnviadaAprobar(orden)">
-                                    <option :value="null">Seleccione Estado</option>
-                                    <option :value="1">SI</option>
-                                    <option :value="0">NO</option>
-                                </select>
-                            </td>
-                            <td>{{ orden.autorizada }}</td>
-                            <td>
-                                <select v-model="orden.enviada_a_proveedor" class="form-control" @change="updateEnviadaProveedor(orden)">
-                                    <option :value="null">Seleccione Estado</option>
-                                    <option :value="1">SI</option>
-                                    <option :value="0">NO</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select v-model="orden.confirmada_por_proveedor" class="form-control" @change="updateConfirmadaProveedor(orden)">
-                                    <option :value="null">Seleccione Estado</option>
-                                    <option :value="1">SI</option>
-                                    <option :value="0">NO</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="date" v-model="orden.fecha_envio_proveedor" @change="updateFecha(orden)" class="form-control" :min="orden.fecha_orden_compra">
-                            </td>
-                            <td>
-                                <textarea class="form-control" v-model="orden.observaciones" @change="updateTextArea(orden)"></textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination" v-if="total_registros > 15">
-            <label for="records-per-page">Registros por página:</label>
-            <select 
-                id="records-per-page" 
-                v-model="limit" 
-                @change="changePage(1)"
-            >
-                <option value="15">15</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-            </select>
-            <button 
-                :disabled="position <= 1" 
-                @click="changePage(1)"
-            >
-                Primera
-            </button>
-            
-            <button 
-                :disabled="position <= 1" 
-                @click="changePage(position - 1)"
-            >
-                Anterior
-            </button>
-            
-            <span>Página {{ position }} de {{ total_paginas }}</span>
-            
-            <button 
-                :disabled="position >= total_paginas" 
-                @click="changePage(position + 1)"
-            >
-                Siguiente
-            </button>
-            
-            <button 
-                :disabled="position >= total_paginas" 
-                @click="changePage(total_paginas)"
-            >
-                Última
-            </button>
             </div>
         </div>
 

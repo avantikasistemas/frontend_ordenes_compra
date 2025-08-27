@@ -128,7 +128,7 @@
                 </thead>
                 <tbody>
                     <tr v-if="lista_ordenes.length === 0">
-                        <td colspan="10" class="no-registros">No hay registros disponibles</td>
+                        <td colspan="11" class="no-registros">No hay registros disponibles</td>
                     </tr>
                     <tr v-else v-for="orden in lista_ordenes" :key="orden.consecutivo" @click="selectRow(orden)" :class="{ 'selected-row': orden.consecutivo === selectedOrdenId }">
                         <td>{{ orden.numero }}</td>
