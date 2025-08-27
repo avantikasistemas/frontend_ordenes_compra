@@ -1,13 +1,22 @@
 <template>
     <LayoutView>
         <div class="form-container">
-
             <div class="card">
                 <!-- Logo -->
                 <img :src="logotipo" alt="logotipo" class="logotipo" />
 
                 <!-- Texto principal -->
-                <h2 class="title">FORMATO ÓRDENES DE COMPRA NACIONAL</h2>
+                <h2 class="title">FORMATO ÓRDENES DE COMPRA {{ nombre }}</h2>
+
+                <!-- Radio buttons en fila -->
+                <div class="radio-row">
+                  <label>
+                    <input type="radio" value="1" v-model="tipoOc" @change="tipoOcChanged(tipoOc)" /> Nacional
+                  </label>
+                  <label>
+                    <input type="radio" value="2" v-model="tipoOc" @change="tipoOcChanged(tipoOc)" /> Exterior
+                  </label>
+                </div>
 
                 <!-- Cuadro interno -->
                 <form @submit.prevent="buscarOcNacional">
@@ -41,6 +50,57 @@
                     </div>
                 </form>
             </div>
+        </div>
+
+        <div v-if="data_response_oc">
+            <h6 style="justify-self: center;">FORMATO PARA ELABORAR ORDENES DE COMPRA {{ nombre_titulo }}</h6>
+            <div style="display: flex;">
+              <strong>Fecha:&nbsp;</strong> {{ data_response_oc.fecha_formateada }}&nbsp;&nbsp;-&nbsp;OC{{oc}}&nbsp;&nbsp;<strong>Moneda OC:&nbsp;</strong>{{ data_response_oc.nombre_moneda }} - {{ data_response_oc.tasav }}
+            </div>
+            <div style="display: flex;">
+              <strong>Proveedor:&nbsp;</strong> {{ data_response_oc.data_tercero.nombres }}&nbsp;-&nbsp;{{ data_response_oc.data_tercero.ciudad }}&nbsp;&nbsp;<strong>Teléfono:</strong>&nbsp;{{ data_response_oc.data_tercero.telefono_1 }}
+            </div>
+            <div style="display: flex;">
+              <strong>Condición de Pago Proveedor:&nbsp;</strong> {{ data_response_oc.condicion_tercero }}
+            </div>
+            <div style="display: flex;">
+              <strong>Condición de pago de esta orden de compra:&nbsp;</strong> {{ data_response_oc.condicion_orden }}
+            </div>
+
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th rowspan="2">Item</th>
+                  <th rowspan="2">Código</th>
+                  <th rowspan="2">Observación</th>
+                  <th rowspan="2">Cantidad a Comprar</th>
+                  <th rowspan="2">Cantidad Pedida</th>
+                  <th rowspan="2">Stock Disponible</th>
+                  <th rowspan="2">Backorder Disponible</th>
+                  <th rowspan="2">Descripción</th>
+                  <th rowspan="2">Marca</th>
+                  <th rowspan="2">Presentación</th>
+                  <th colspan="3">Valores antes de IVA</th>
+                  <th rowspan="2">% Utilidad</th>
+                  <th rowspan="2">KIT</th>
+                  <th rowspan="2">Cliente</th>
+                  <th rowspan="2">Ciudad</th>
+                  <th rowspan="2">Fecha Compromiso</th>
+                  <th rowspan="2">Costo Total por Item</th>
+                  <th rowspan="2">Precio Total por Item</th>
+                </tr>
+                <tr>
+                  <th>Costo Cotizado</th>
+                  <th>Costo Unitario a Comprar</th>
+                  <th>Precio Venta Unitario</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Aquí van tus filas dinámicas -->
+              </tbody>
+            </table>
+
+
         </div>
 
 
@@ -113,17 +173,28 @@ const modalErrorInstance = ref(null);
 
 const loading = ref(false);
 const loading_msg = ref('');
+const tipoOc = ref(1); // Por defecto nacional
+const nombre = ref('NACIONAL');
+const nombre_titulo = ref('PROVEEDORES NACIONALES');
+
+const data_response_oc = ref(null);
 
 const buscarOcNacional = async () => {
     try {
-        loading.value = true;
-        loading_msg.value = 'Buscando...';
-        const response = await axios.post(
-            `${apiUrl}/buscar_oc_nacional`, 
-            {
+      if (oc.value == ''){
+        alert('Por favor ingrese un número de orden de compra.');
+        return;
+      }
+
+      loading.value = true;
+      loading_msg.value = 'Buscando...';
+      const response = await axios.post(
+          `${apiUrl}/buscar_oc_nacional`, 
+          {
                 oc: oc.value,
                 tasa: tasa.value,
-                factor: factor.value
+                factor: factor.value,
+                tipo_oc: tipoOc.value
             },
             {
                 headers: {
@@ -133,7 +204,7 @@ const buscarOcNacional = async () => {
         );
 
         if (response.status === 200) {
-            console.log(response.data.data);
+            data_response_oc.value = response.data.data;
         }
     } catch (error) {
         console.error(error);
@@ -150,11 +221,20 @@ const limpiar = () => {
   factor.value = 1.00;
 }
 
+const tipoOcChanged = (tipoOc) => {
+  if (tipoOc === 1 || tipoOc === "1") {
+    nombre.value = 'NACIONAL';
+    nombre_titulo.value = 'PROVEEDORES NACIONALES';
+  } else if (tipoOc === 2 || tipoOc === "2") {
+    nombre.value = 'EXTERIOR';
+    nombre_titulo.value = 'PROVEEDORES DEL EXTERIOR';
+  }
+};
+
 // Código que se ejecuta al montar el componente
 onMounted(() => {
   modalInstance.value = new Modal(exitoModal);
   modalErrorInstance.value = new Modal(errorModal);
-//   cargarDatos();
 });
 
 </script>
@@ -163,6 +243,10 @@ onMounted(() => {
 body {
     background-color: #f3f4f6;
     font-family: 'Roboto', sans-serif;
+}
+
+:deep(.main-content) {
+  padding: 0 !important;
 }
 
 .form-container {
@@ -203,6 +287,21 @@ body {
   font-weight: bold;
   margin-bottom: 16px;
   color: #333;
+}
+
+.radio-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.radio-row label {
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .input-section {
@@ -265,4 +364,44 @@ body {
   font-size: 13px;
   margin-top: 6px;
 }
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  text-align: left;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-table thead th {
+  background-color: #f4f6f8;
+  color: #374151;
+  font-weight: 600;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.custom-table thead tr:first-child th {
+  text-align: center;
+}
+
+.custom-table tbody td {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #eef2f7;
+  transition: background 0.2s ease-in-out;
+}
+
 </style>
