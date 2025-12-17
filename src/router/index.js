@@ -1,20 +1,34 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import MainView from '@/views/MainView.vue';
-import OcNacionalView from '@/views/OcNacionalView.vue';
-import MainViewAdmin from '@/views/MainViewAdmin.vue';
-import AnularView from '@/views/AnularView.vue';
-import VistaAnulacionView from '@/views/VistaAnulacionView.vue';
+import { createRouter, createWebHistory } from "vue-router";
+import MainView from "@/views/MainView.vue";
+import OcNacionalView from "@/views/OcNacionalView.vue";
+import MainViewAdmin from "@/views/MainViewAdmin.vue";
+import AnularView from "@/views/AnularView.vue";
+import VistaAnulacionView from "@/views/VistaAnulacionView.vue";
+
+import KitDetailView from "@/views/KitDetailView.vue";
+
+import AutorizarView from '@/views/AutorizarView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {path: '/', name: 'main', component: MainView},
-    {path: '/oc_nacional', name: 'oc_nacional', component: OcNacionalView},
-    {path: '/control-administrativo', name: 'control-administrativo', component: MainViewAdmin},
-    {path: '/anular', name: 'anular', component: AnularView},
-    {path: '/oc/anulaciones/:id', name: 'anular_oc', component: VistaAnulacionView}
-  ]
-})
+    { path: "/", name: "main", component: MainView },
+    { path: "/oc_nacional", name: "oc_nacional", component: OcNacionalView },
+    {
+      path: "/control-administrativo",
+      name: "control-administrativo",
+      component: MainViewAdmin,
+    },
+    { path: "/anular", name: "anular", component: AnularView },
+    {
+      path: "/oc/anulaciones/:id",
+      name: "anular_oc",
+      component: VistaAnulacionView,
+    },
+    { path: "/consultar-kit", name: "consultar_kit", component: KitDetailView },
+    { path: "/autorizar", name: "autorizar", component: AutorizarView },
+  ],
+});
 
 // router.beforeEach((to, from, next) => {
 
@@ -33,4 +47,4 @@ const router = createRouter({
 //   }
 // });
 
-export default router
+export default router;
